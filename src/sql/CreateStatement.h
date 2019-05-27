@@ -20,6 +20,12 @@ namespace hsql {
     TEXT
   };
 
+  enum class EncodingType {
+    UNKNOWN,
+    RAW,
+    DICT,
+  };
+
   // Represents the type of a column, e.g., FLOAT or VARCHAR(10)
   struct ColumnType {
     ColumnType() = default;
@@ -28,18 +34,29 @@ namespace hsql {
     int64_t length;  // Used for, e.g., VARCHAR(10)
   };
 
+  // Represents the encoding type of a column, e.g., ENCODING DICT or ENCODING RAW
+  struct Cardinality {
+    Cardinality() = default;
+    Cardinality(int64_t cardinality, int64_t chunkSize);
+    int64_t cardinality;
+    int64_t chunkSize;
+  };
+
   bool operator==(const ColumnType& lhs, const ColumnType& rhs);
   bool operator!=(const ColumnType& lhs, const ColumnType& rhs);
   std::ostream& operator<<(std::ostream&, const ColumnType&);
 
   // Represents definition of a table column
   struct ColumnDefinition {
-    ColumnDefinition(char* name, ColumnType type, bool nullable);
+    ColumnDefinition(char* name, ColumnType type, Cardinality cardinality, bool nullable, Expr* defaultExpr, EncodingType encoding);
     virtual ~ColumnDefinition();
 
     char* name;
     ColumnType type;
+    Cardinality cardinality;
     bool nullable;
+    Expr* defaultExpr;
+    EncodingType encoding;
   };
 
   enum CreateType {

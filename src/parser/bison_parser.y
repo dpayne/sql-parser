@@ -124,6 +124,8 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 	hsql::GroupByDescription* group_t;
 	hsql::UpdateClause* update_t;
 	hsql::Alias* alias_t;
+	hsql::EncodingType encoding_t;
+	hsql::Cardinality cardinality_t;
 
 	std::vector<hsql::SQLStatement*>* stmt_vec;
 
@@ -140,7 +142,7 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 /*********************************
  ** Destructor symbols
  *********************************/
-%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t>
+%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t> <encoding_t> <cardinality_t>
 %destructor { free( ($$.name) ); free( ($$.schema) ); } <table_name>
 %destructor { free( ($$) ); } <sval>
 %destructor {
@@ -177,6 +179,7 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 %token VIEW WHEN WITH ADD ALL AND ASC CSV END FOR INT KEY
 %token NOT OFF SET TBL TOP AS BY IF IN IS OF ON OR TO
 %token ARRAY CONCAT ILIKE SECOND MINUTE HOUR DAY MONTH YEAR
+%token ENCODING DICT CARDINALITY
 %token TRUE FALSE
 
 /*********************************
@@ -200,11 +203,14 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 %type <uval>		    import_file_type opt_join_type
 %type <table> 		    opt_from_clause from_clause table_ref table_ref_atomic table_ref_name nonjoin_table_ref_atomic
 %type <table>		    join_clause table_ref_name_no_alias
+%type <encoding_t>	    opt_encoding
+%type <cardinality_t>   cardinality
 %type <expr> 		    expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr
 %type <expr>		    function_expr between_expr expr_alias param_expr
 %type <expr> 		    column_name literal int_literal num_literal string_literal bool_literal
 %type <expr> 		    comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
 %type <expr> 		    array_expr array_index null_literal
+%type <expr> 		    opt_column_default
 %type <limit>		    opt_limit opt_top
 %type <order>		    order_desc
 %type <order_type>	    opt_order_type
@@ -451,8 +457,8 @@ column_def_commalist:
 	;
 
 column_def:
-		IDENTIFIER column_type opt_column_nullable {
-			$$ = new ColumnDefinition($1, $2, $3);
+		IDENTIFIER column_type cardinality opt_column_nullable opt_column_default opt_encoding {
+			$$ = new ColumnDefinition($1, $2, $3, $4, $5, $6);
 		}
 	;
 
@@ -467,10 +473,24 @@ column_type:
 	|	TEXT { $$ = ColumnType{DataType::TEXT}; }
 	;
 
+cardinality:
+		CARDINALITY '(' INTVAL ',' INTVAL ')' { $$ = Cardinality{$3, $5}; }
+	;
+
+opt_encoding:
+		ENCODING DICT { $$ = EncodingType::DICT; }
+	|	/* empty */ { $$ = EncodingType::RAW; }
+	;
+
 opt_column_nullable:
 		NULL { $$ = true; }
 	|	NOT NULL { $$ = false; }
 	|	/* empty */ { $$ = false; }
+	;
+
+opt_column_default:
+		DEFAULT expr { $$ = $2; }
+	|	/* empty */ { $$ = nullptr; }
 	;
 
 /******************************
