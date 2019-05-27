@@ -3,13 +3,13 @@
 namespace hsql {
 
   // ColumnDefinition
-  ColumnDefinition::ColumnDefinition(char* name, ColumnType type, Cardinality cardinality, bool nullable, Expr* defaultExpr, EncodingType encoding) :
+  ColumnDefinition::ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, EncodingType encoding, Cardinality* cardinality) :
     name(name),
     type(type),
-    cardinality(cardinality),
     nullable(nullable),
     defaultExpr(defaultExpr),
-    encoding(encoding) {};
+    encoding(encoding),
+    cardinality(cardinality) {};
 
   ColumnDefinition::~ColumnDefinition() {
     free(name);

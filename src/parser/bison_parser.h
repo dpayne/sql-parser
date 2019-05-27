@@ -271,7 +271,7 @@ union HSQL_STYPE
 	hsql::UpdateClause* update_t;
 	hsql::Alias* alias_t;
 	hsql::EncodingType encoding_t;
-	hsql::Cardinality cardinality_t;
+	hsql::Cardinality* cardinality_t;
 
 	std::vector<hsql::SQLStatement*>* stmt_vec;
 

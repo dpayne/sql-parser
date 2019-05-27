@@ -125,7 +125,7 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 	hsql::UpdateClause* update_t;
 	hsql::Alias* alias_t;
 	hsql::EncodingType encoding_t;
-	hsql::Cardinality cardinality_t;
+	hsql::Cardinality* cardinality_t;
 
 	std::vector<hsql::SQLStatement*>* stmt_vec;
 
@@ -142,7 +142,7 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 /*********************************
  ** Destructor symbols
  *********************************/
-%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t> <encoding_t> <cardinality_t>
+%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t> <encoding_t>
 %destructor { free( ($$.name) ); free( ($$.schema) ); } <table_name>
 %destructor { free( ($$) ); } <sval>
 %destructor {
@@ -204,7 +204,7 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 %type <table> 		    opt_from_clause from_clause table_ref table_ref_atomic table_ref_name nonjoin_table_ref_atomic
 %type <table>		    join_clause table_ref_name_no_alias
 %type <encoding_t>	    opt_encoding
-%type <cardinality_t>   cardinality
+%type <cardinality_t>   opt_cardinality
 %type <expr> 		    expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr
 %type <expr>		    function_expr between_expr expr_alias param_expr
 %type <expr> 		    column_name literal int_literal num_literal string_literal bool_literal
@@ -457,7 +457,7 @@ column_def_commalist:
 	;
 
 column_def:
-		IDENTIFIER column_type cardinality opt_column_nullable opt_column_default opt_encoding {
+		IDENTIFIER column_type opt_column_nullable opt_column_default opt_encoding opt_cardinality {
 			$$ = new ColumnDefinition($1, $2, $3, $4, $5, $6);
 		}
 	;
@@ -473,8 +473,9 @@ column_type:
 	|	TEXT { $$ = ColumnType{DataType::TEXT}; }
 	;
 
-cardinality:
-		CARDINALITY '(' INTVAL ',' INTVAL ')' { $$ = Cardinality{$3, $5}; }
+opt_cardinality:
+		CARDINALITY '(' INTVAL ',' INTVAL ')' { $$ = new Cardinality{$3, $5}; }
+	|	/* empty */ { $$ = nullptr; }
 	;
 
 opt_encoding:
