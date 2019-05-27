@@ -37,7 +37,7 @@ namespace hsql {
   // Represents the encoding type of a column, e.g., ENCODING DICT or ENCODING RAW
   struct Cardinality {
     Cardinality() = default;
-    Cardinality(int64_t cardinality, int64_t chunkSize);
+    Cardinality(int64_t cardinality, int64_t chunkSize) : cardinality(cardinality), chunkSize(chunkSize) {};
     int64_t cardinality;
     int64_t chunkSize;
   };
