@@ -61,8 +61,9 @@ TEST(CreateTestNullable) {
 }
 
 TEST(CreateTestNotNullable) {
-  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR("CREATE TABLE test (v1 INTEGER NOT NULL);", kStmtCreate,
-                        CreateStatement, result, stmt);
+  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR(
+      "CREATE TABLE test (v1 INTEGER NOT NULL);", kStmtCreate, CreateStatement,
+      result, stmt);
 
   ASSERT_EQ(1, stmt->columns->size());
 
@@ -73,8 +74,9 @@ TEST(CreateTestNotNullable) {
 }
 
 TEST(CreateTestEncodingDict) {
-  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR( "CREATE TABLE test (v1 INTEGER ENCODING DICT);", kStmtCreate,
-                            CreateStatement, result, stmt);
+  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR(
+      "CREATE TABLE test (v1 INTEGER ENCODING DICT);", kStmtCreate,
+      CreateStatement, result, stmt);
 
   ASSERT_EQ(1, stmt->columns->size());
 
@@ -85,8 +87,9 @@ TEST(CreateTestEncodingDict) {
 }
 
 TEST(CreateTestEncodingDictWithArg) {
-  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR( "CREATE TABLE test (v1 INTEGER ENCODING DICT(arg1));", kStmtCreate,
-                            CreateStatement, result, stmt);
+  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR(
+      "CREATE TABLE test (v1 INTEGER ENCODING DICT(arg1));", kStmtCreate,
+      CreateStatement, result, stmt);
 
   ASSERT_EQ(1, stmt->columns->size());
 
@@ -98,8 +101,9 @@ TEST(CreateTestEncodingDictWithArg) {
 }
 
 TEST(CreateTestCardinality) {
-  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR( "CREATE TABLE test (v1 INTEGER ENCODING DICT CARDINALITY(10000,100));", kStmtCreate,
-                            CreateStatement, result, stmt);
+  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR(
+      "CREATE TABLE test (v1 INTEGER ENCODING DICT CARDINALITY(10000,100));",
+      kStmtCreate, CreateStatement, result, stmt);
 
   ASSERT_EQ(1, stmt->columns->size());
 
@@ -112,8 +116,9 @@ TEST(CreateTestCardinality) {
 }
 
 TEST(CreateTestAggregation) {
-  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR( "CREATE TABLE test (v1 INTEGER AGGREGATION(SUM));", kStmtCreate,
-                            CreateStatement, result, stmt);
+  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR(
+      "CREATE TABLE test (v1 INTEGER AGGREGATION(SUM));", kStmtCreate,
+      CreateStatement, result, stmt);
 
   ASSERT_EQ(1, stmt->columns->size());
 
