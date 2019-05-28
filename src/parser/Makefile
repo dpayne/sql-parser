@@ -1,6 +1,7 @@
 # bison's version is too old on OSX, allow user to pass in custom path
 BISON?=bison
 FLEX?=flex
+PYTHON?=python2
 
 BISON_VERSION=$(shell $(BISON) --version | head -n 1 | grep -o '[0-9]\.[0-9]\+')
 BISON_VERSION_SUPPORTED=$(shell echo $(BISON_VERSION) \>= 3.0 | bc)
@@ -21,6 +22,9 @@ bison_parser.cpp: bison_parser.y
 
 flex_lexer.cpp: flex_lexer.l
 	$(FLEX) flex_lexer.l
+
+generate_keywords:
+	$(PYTHON) keywordlist_generator.py
 
 clean:
 	rm -f bison_parser.cpp flex_lexer.cpp bison_parser.h flex_lexer.h *.output

@@ -6,11 +6,15 @@ namespace hsql {
 
   SQLParserResult::SQLParserResult() :
     isValid_(false),
-    errorMsg_(nullptr) {};
+    errorMsg_(nullptr),
+    errorLine_(0),
+    errorColumn_(0) {};
 
   SQLParserResult::SQLParserResult(SQLStatement* stmt) :
     isValid_(false),
-    errorMsg_(nullptr) {
+    errorMsg_(nullptr),
+    errorLine_(0),
+    errorColumn_(0) {
     addStatement(stmt);
   };
 

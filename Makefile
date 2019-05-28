@@ -71,6 +71,9 @@ $(SRCPARSER)/bison_parser.cpp: $(SRCPARSER)/bison_parser.y
 $(SRCPARSER)/flex_lexer.cpp: $(SRCPARSER)/flex_lexer.l
 	$(GMAKE) -C $(SRCPARSER)/ flex_lexer.cpp
 
+generate_keywords: $(SRCPARSER)/sql_keywords.txt
+	$(GMAKE) -C $(SRCPARSER)/ generate_keywords
+
 $(SRCPARSER)/bison_parser.h: $(SRCPARSER)/bison_parser.cpp
 $(SRCPARSER)/flex_lexer.h: $(SRCPARSER)/flex_lexer.cpp
 

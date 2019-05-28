@@ -13,6 +13,7 @@ namespace hsql {
 
   ColumnDefinition::~ColumnDefinition() {
     free(name);
+    delete(defaultExpr);
   }
 
   ColumnType::ColumnType(DataType data_type, int64_t length) :
