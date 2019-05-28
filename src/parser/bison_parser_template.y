@@ -191,7 +191,7 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 %type <expr> 		    expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr
 %type <expr>		    function_expr between_expr expr_alias param_expr
 %type <expr> 		    column_name literal int_literal num_literal string_literal bool_literal
-%type <expr> 		    comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
+%type <expr> 		    comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint opt_aggregation
 %type <expr> 		    array_expr array_index null_literal
 %type <expr> 		    opt_column_default
 %type <limit>		    opt_limit opt_top
@@ -440,8 +440,8 @@ column_def_commalist:
 	;
 
 column_def:
-		IDENTIFIER column_type opt_column_nullable opt_column_default opt_encoding opt_cardinality {
-			$$ = new ColumnDefinition($1, $2, $3, $4, $5, $6);
+		IDENTIFIER column_type opt_column_nullable opt_column_default opt_encoding opt_cardinality opt_aggregation {
+			$$ = new ColumnDefinition($1, $2, $3, $4, $5, $6, $7);
 		}
 	;
 
@@ -459,6 +459,14 @@ column_type:
 opt_cardinality:
 		CARDINALITY '(' INTVAL ',' INTVAL ')' { $$ = new Cardinality{$3, $5}; }
 	|	/* empty */ { $$ = nullptr; }
+	;
+
+opt_aggregation:
+		AGGREGATION '(' IDENTIFIER ')' {
+			$$ = Expr::make(kExprLiteralString);
+			$$->name = $3;
+		}
+		| /* empty */ { $$ = nullptr; }
 	;
 
 opt_encoding:

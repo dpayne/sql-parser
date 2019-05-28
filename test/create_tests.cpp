@@ -109,3 +109,19 @@ TEST(CreateTestCardinality) {
   ASSERT_EQ(10000, stmt->columns->at(0)->cardinality->cardinality);
   ASSERT_EQ(100, stmt->columns->at(0)->cardinality->chunkSize);
 }
+
+TEST(CreateTestAggregation) {
+  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR( "CREATE TABLE test (v1 INTEGER AGGREGATION(SUM));", kStmtCreate,
+                            CreateStatement, result, stmt);
+
+  ASSERT_EQ(1, stmt->columns->size());
+
+  ASSERT_TRUE(hsql::DataType::INT == stmt->columns->at(0)->type.data_type);
+  ASSERT_FALSE(stmt->columns->at(0)->nullable);
+  ASSERT_NULL(stmt->columns->at(0)->defaultExpr);
+  ASSERT_NULL(stmt->columns->at(0)->cardinality);
+  ASSERT_NOTNULL(stmt->columns->at(0)->aggregation);
+  ASSERT_TRUE(stmt->columns->at(0)->aggregation->type == kExprLiteralString);
+  ASSERT_EQ(std::string("SUM"),
+            std::string(stmt->columns->at(0)->aggregation->name));
+}

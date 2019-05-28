@@ -165,23 +165,23 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 
 /* */
 /* SQL Keywords */
-%token CARDINALITY DEALLOCATE PARAMETERS INTERSECT TEMPORARY
-%token TIMESTAMP DISTINCT ENCODING NVARCHAR RESTRICT
-%token TRUNCATE ANALYZE BETWEEN CASCADE COLUMNS CONTROL
-%token DEFAULT EXECUTE EXPLAIN EXTRACT HISTORY INTEGER
-%token NATURAL PREPARE PRIMARY SCHEMAS SPATIAL VARCHAR
-%token VIRTUAL BEFORE COLUMN CREATE DELETE DIRECT DOUBLE
-%token ESCAPE EXCEPT EXISTS GLOBAL HAVING IMPORT INSERT
-%token ISNULL MINUTE OFFSET RENAME SCHEMA SECOND SELECT
-%token SORTED TABLES UNIQUE UNLOAD UPDATE VALUES AFTER
-%token ALTER ARRAY CROSS DELTA FALSE FLOAT GROUP ILIKE
-%token INDEX INNER LIMIT LOCAL MERGE MINUS MONTH ORDER
-%token OUTER RIGHT TABLE UNION USING WHERE CALL CASE CHAR
-%token DATE DESC DICT DROP ELSE FILE FROM FULL HASH HINT
-%token HOUR INTO JOIN LEFT LIKE LOAD LONG NULL PLAN SHOW
-%token TEXT THEN TIME TRUE VIEW WHEN WITH YEAR ADD ALL AND
-%token ASC CSV DAY END FOR INT KEY NOT OFF SET TBL TOP AS
-%token BY IF IN IS OF ON OR TO
+%token AGGREGATION CARDINALITY DEALLOCATE PARAMETERS
+%token INTERSECT TEMPORARY TIMESTAMP DISTINCT ENCODING
+%token NVARCHAR RESTRICT TRUNCATE ANALYZE BETWEEN CASCADE
+%token COLUMNS CONTROL DEFAULT EXECUTE EXPLAIN EXTRACT
+%token HISTORY INTEGER NATURAL PREPARE PRIMARY SCHEMAS
+%token SPATIAL VARCHAR VIRTUAL BEFORE COLUMN CREATE DELETE
+%token DIRECT DOUBLE ESCAPE EXCEPT EXISTS GLOBAL HAVING
+%token IMPORT INSERT ISNULL MINUTE OFFSET RENAME SCHEMA
+%token SECOND SELECT SORTED TABLES UNIQUE UNLOAD UPDATE
+%token VALUES AFTER ALTER ARRAY CROSS DELTA FALSE FLOAT
+%token GROUP ILIKE INDEX INNER LIMIT LOCAL MERGE MINUS
+%token MONTH ORDER OUTER RIGHT TABLE UNION USING WHERE CALL
+%token CASE CHAR DATE DESC DICT DROP ELSE FILE FROM FULL
+%token HASH HINT HOUR INTO JOIN LEFT LIKE LOAD LONG NULL
+%token PLAN SHOW TEXT THEN TIME TRUE VIEW WHEN WITH YEAR
+%token ADD ALL AND ASC CSV DAY END FOR INT KEY NOT OFF SET
+%token TBL TOP AS BY IF IN IS OF ON OR TO
  /* */
 
 /*********************************
@@ -210,7 +210,7 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 %type <expr> 		    expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr
 %type <expr>		    function_expr between_expr expr_alias param_expr
 %type <expr> 		    column_name literal int_literal num_literal string_literal bool_literal
-%type <expr> 		    comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
+%type <expr> 		    comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint opt_aggregation
 %type <expr> 		    array_expr array_index null_literal
 %type <expr> 		    opt_column_default
 %type <limit>		    opt_limit opt_top
@@ -459,8 +459,8 @@ column_def_commalist:
 	;
 
 column_def:
-		IDENTIFIER column_type opt_column_nullable opt_column_default opt_encoding opt_cardinality {
-			$$ = new ColumnDefinition($1, $2, $3, $4, $5, $6);
+		IDENTIFIER column_type opt_column_nullable opt_column_default opt_encoding opt_cardinality opt_aggregation {
+			$$ = new ColumnDefinition($1, $2, $3, $4, $5, $6, $7);
 		}
 	;
 
@@ -478,6 +478,14 @@ column_type:
 opt_cardinality:
 		CARDINALITY '(' INTVAL ',' INTVAL ')' { $$ = new Cardinality{$3, $5}; }
 	|	/* empty */ { $$ = nullptr; }
+	;
+
+opt_aggregation:
+		AGGREGATION '(' IDENTIFIER ')' {
+			$$ = Expr::make(kExprLiteralString);
+			$$->name = $3;
+		}
+		| /* empty */ { $$ = nullptr; }
 	;
 
 opt_encoding:

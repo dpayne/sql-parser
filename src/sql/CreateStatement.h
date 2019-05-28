@@ -48,7 +48,7 @@ namespace hsql {
 
   // Represents definition of a table column
   struct ColumnDefinition {
-    ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, EncodingType encoding, Cardinality* cardinality);
+    ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, EncodingType encoding, Cardinality* cardinality, Expr* aggregation);
     virtual ~ColumnDefinition();
 
     char* name;
@@ -57,6 +57,7 @@ namespace hsql {
     Expr* defaultExpr;
     EncodingType encoding;
     Cardinality* cardinality;
+    Expr* aggregation;
   };
 
   enum CreateType {

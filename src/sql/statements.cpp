@@ -3,18 +3,20 @@
 namespace hsql {
 
   // ColumnDefinition
-  ColumnDefinition::ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, EncodingType encoding, Cardinality* cardinality) :
+  ColumnDefinition::ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, EncodingType encoding, Cardinality* cardinality, Expr* aggregation) :
     name(name),
     type(type),
     nullable(nullable),
     defaultExpr(defaultExpr),
     encoding(encoding),
-    cardinality(cardinality) {};
+    cardinality(cardinality),
+    aggregation(aggregation) {};
 
   ColumnDefinition::~ColumnDefinition() {
     free(name);
     delete(defaultExpr);
     delete(cardinality);
+    delete(aggregation);
   }
 
   ColumnType::ColumnType(DataType data_type, int64_t length) :

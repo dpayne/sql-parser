@@ -61,6 +61,7 @@ static thread_local std::stringstream strbuf;
 
 [ \t\n]+	/* skip whitespace */;
  /* */
+AGGREGATION	TOKEN(AGGREGATION)
 CARDINALITY	TOKEN(CARDINALITY)
 DEALLOCATE	TOKEN(DEALLOCATE)
 PARAMETERS	TOKEN(PARAMETERS)
