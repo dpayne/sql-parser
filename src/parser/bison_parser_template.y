@@ -124,8 +124,8 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 	hsql::GroupByDescription* group_t;
 	hsql::UpdateClause* update_t;
 	hsql::Alias* alias_t;
-	hsql::EncodingType encoding_t;
 	hsql::Cardinality* cardinality_t;
+	hsql::Encoding* encoding_t;
 
 	std::vector<hsql::SQLStatement*>* stmt_vec;
 
@@ -142,8 +142,9 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 /*********************************
  ** Destructor symbols
  *********************************/
-%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t> <encoding_t>
+%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t>
 %destructor { free( ($$.name) ); free( ($$.schema) ); } <table_name>
+%destructor { free( ($$->encoding) ); free( ($$->arg) ); } <encoding_t>
 %destructor { free( ($$) ); } <sval>
 %destructor {
 	if (($$) != nullptr) {
@@ -470,8 +471,9 @@ opt_aggregation:
 	;
 
 opt_encoding:
-		ENCODING DICT { $$ = EncodingType::DICT; }
-	|	/* empty */ { $$ = EncodingType::RAW; }
+		ENCODING IDENTIFIER { $$ = new Encoding($2); }
+	|	ENCODING IDENTIFIER '(' IDENTIFIER ')' { $$ = new Encoding($2, $4); }
+	|	/* empty */ { $$ = nullptr; }
 	;
 
 opt_column_nullable:

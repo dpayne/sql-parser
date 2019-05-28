@@ -20,12 +20,6 @@ namespace hsql {
     TEXT
   };
 
-  enum class EncodingType {
-    UNKNOWN,
-    RAW,
-    DICT,
-  };
-
   // Represents the type of a column, e.g., FLOAT or VARCHAR(10)
   struct ColumnType {
     ColumnType() = default;
@@ -42,20 +36,33 @@ namespace hsql {
     int64_t chunkSize;
   };
 
+  struct Encoding {
+    ~Encoding()
+    {
+        free(encoding);
+        free(arg);
+    }
+
+    Encoding(char* encoding) : encoding(encoding), arg(nullptr) {};
+    Encoding(char* encoding, char* arg) : encoding(encoding), arg(arg) {};
+    char* encoding;
+    char* arg;
+  };
+
   bool operator==(const ColumnType& lhs, const ColumnType& rhs);
   bool operator!=(const ColumnType& lhs, const ColumnType& rhs);
   std::ostream& operator<<(std::ostream&, const ColumnType&);
 
   // Represents definition of a table column
   struct ColumnDefinition {
-    ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, EncodingType encoding, Cardinality* cardinality, Expr* aggregation);
+    ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, Encoding* encoding, Cardinality* cardinality, Expr* aggregation);
     virtual ~ColumnDefinition();
 
     char* name;
     ColumnType type;
     bool nullable;
     Expr* defaultExpr;
-    EncodingType encoding;
+    Encoding* encoding;
     Cardinality* cardinality;
     Expr* aggregation;
   };

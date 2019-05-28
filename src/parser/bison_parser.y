@@ -124,8 +124,8 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 	hsql::GroupByDescription* group_t;
 	hsql::UpdateClause* update_t;
 	hsql::Alias* alias_t;
-	hsql::EncodingType encoding_t;
 	hsql::Cardinality* cardinality_t;
+	hsql::Encoding* encoding_t;
 
 	std::vector<hsql::SQLStatement*>* stmt_vec;
 
@@ -142,8 +142,9 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 /*********************************
  ** Destructor symbols
  *********************************/
-%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t> <encoding_t>
+%destructor { } <fval> <ival> <uval> <bval> <order_type> <datetime_field> <column_type_t>
 %destructor { free( ($$.name) ); free( ($$.schema) ); } <table_name>
+%destructor { free( ($$->encoding) ); free( ($$->arg) ); } <encoding_t>
 %destructor { free( ($$) ); } <sval>
 %destructor {
 	if (($$) != nullptr) {
@@ -177,11 +178,11 @@ int yyerror(YYLTYPE* llocp, SQLParserResult* result, yyscan_t scanner, const cha
 %token VALUES AFTER ALTER ARRAY CROSS DELTA FALSE FLOAT
 %token GROUP ILIKE INDEX INNER LIMIT LOCAL MERGE MINUS
 %token MONTH ORDER OUTER RIGHT TABLE UNION USING WHERE CALL
-%token CASE CHAR DATE DESC DICT DROP ELSE FILE FROM FULL
-%token HASH HINT HOUR INTO JOIN LEFT LIKE LOAD LONG NULL
-%token PLAN SHOW TEXT THEN TIME TRUE VIEW WHEN WITH YEAR
-%token ADD ALL AND ASC CSV DAY END FOR INT KEY NOT OFF SET
-%token TBL TOP AS BY IF IN IS OF ON OR TO
+%token CASE CHAR DATE DESC DROP ELSE FILE FROM FULL HASH
+%token HINT HOUR INTO JOIN LEFT LIKE LOAD LONG NULL PLAN
+%token SHOW TEXT THEN TIME TRUE VIEW WHEN WITH YEAR ADD ALL
+%token AND ASC CSV DAY END FOR INT KEY NOT OFF SET TBL TOP
+%token AS BY IF IN IS OF ON OR TO
  /* */
 
 /*********************************
@@ -489,8 +490,9 @@ opt_aggregation:
 	;
 
 opt_encoding:
-		ENCODING DICT { $$ = EncodingType::DICT; }
-	|	/* empty */ { $$ = EncodingType::RAW; }
+		ENCODING IDENTIFIER { $$ = new Encoding($2); }
+	|	ENCODING IDENTIFIER '(' IDENTIFIER ')' { $$ = new Encoding($2, $4); }
+	|	/* empty */ { $$ = nullptr; }
 	;
 
 opt_column_nullable:

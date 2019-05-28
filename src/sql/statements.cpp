@@ -3,7 +3,7 @@
 namespace hsql {
 
   // ColumnDefinition
-  ColumnDefinition::ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, EncodingType encoding, Cardinality* cardinality, Expr* aggregation) :
+  ColumnDefinition::ColumnDefinition(char* name, ColumnType type, bool nullable, Expr* defaultExpr, Encoding* encoding, Cardinality* cardinality, Expr* aggregation) :
     name(name),
     type(type),
     nullable(nullable),
@@ -15,6 +15,7 @@ namespace hsql {
   ColumnDefinition::~ColumnDefinition() {
     free(name);
     delete(defaultExpr);
+    delete(encoding);
     delete(cardinality);
     delete(aggregation);
   }
