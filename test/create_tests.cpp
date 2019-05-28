@@ -95,3 +95,17 @@ TEST(CreateTestEncodingDict) {
   ASSERT_TRUE(hsql::EncodingType::DICT == stmt->columns->at(0)->encoding);
   ASSERT_NULL(stmt->columns->at(0)->defaultExpr);
 }
+
+TEST(CreateTestCardinality) {
+  TEST_PARSE_SINGLE_SQL_WITH_PRINT_ERROR( "CREATE TABLE test (v1 INTEGER ENCODING DICT CARDINALITY(10000,100));", kStmtCreate,
+                            CreateStatement, result, stmt);
+
+  ASSERT_EQ(1, stmt->columns->size());
+
+  ASSERT_TRUE(hsql::DataType::INT == stmt->columns->at(0)->type.data_type);
+  ASSERT_FALSE(stmt->columns->at(0)->nullable);
+  ASSERT_TRUE(hsql::EncodingType::DICT == stmt->columns->at(0)->encoding);
+  ASSERT_NULL(stmt->columns->at(0)->defaultExpr);
+  ASSERT_EQ(10000, stmt->columns->at(0)->cardinality->cardinality);
+  ASSERT_EQ(100, stmt->columns->at(0)->cardinality->chunkSize);
+}

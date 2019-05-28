@@ -14,6 +14,7 @@ namespace hsql {
   ColumnDefinition::~ColumnDefinition() {
     free(name);
     delete(defaultExpr);
+    delete(cardinality);
   }
 
   ColumnType::ColumnType(DataType data_type, int64_t length) :
