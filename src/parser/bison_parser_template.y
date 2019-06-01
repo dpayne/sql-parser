@@ -428,6 +428,11 @@ create_statement:
 			$$->viewColumns = $5;
 			$$->select = $7;
 		}
+	|	CREATE SCHEMA opt_not_exists IDENTIFIER {
+			$$ = new CreateStatement(kCreateSchema);
+			$$->ifNotExists = $3;
+			$$->schema = $4;
+		}
 	;
 
 opt_not_exists:
