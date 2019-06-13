@@ -10,7 +10,8 @@ namespace hsql {
     defaultExpr(defaultExpr),
     encoding(encoding),
     cardinality(cardinality),
-    aggregation(aggregation) {};
+    aggregation(aggregation)
+    {};
 
   ColumnDefinition::~ColumnDefinition() {
     free(name);
